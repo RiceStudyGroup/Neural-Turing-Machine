@@ -77,7 +77,7 @@ class BaseController:
         raise NotImplementedError("network_vars is not implemented")
 
 
-    def network_op(self, X):
+    def network_op(self, X, state=None):
         """
         defines the controller's internal neural network operation
 
@@ -163,13 +163,13 @@ class BaseController:
         parsed['read_strengths'] = tf.nn.softplus(tf.reshape(interface_vector[:, r_keys_end:r_strengths_end], r_scalars_shape))+1
         parsed['read_gates'] = tf.sigmoid(tf.reshape(interface_vector[:, r_strengths_end:r_gates_end], r_scalars_shape))
         parsed['read_gammas'] = tf.nn.softplus(tf.reshape(interface_vector[:, r_gates_end:r_gamma_end], r_scalars_shape))+1
-        parsed['read_shifts'] = tf.nn.softmax(tf.reshape(interface_vector[:, r_gamma_end:r_shift_end], r_shift_shape),dim=1)
+        parsed['read_shifts'] = tf.nn.softmax(tf.reshape(interface_vector[:, r_gamma_end:r_shift_end], r_shift_shape),axis=1)
 
         parsed['write_key'] = tf.reshape(interface_vector[:, r_shift_end:w_key_end], w_key_shape)
         parsed['write_strength'] = tf.nn.softplus(tf.reshape(interface_vector[:, w_key_end:w_strengths_end], w_scalars_shape))+1
         parsed['write_gate'] = tf.sigmoid(tf.reshape(interface_vector[:, w_strengths_end:w_gates_end], w_scalars_shape))
         parsed['write_gamma'] = tf.nn.softplus(tf.reshape(interface_vector[:, w_gates_end:w_gamma_end], w_scalars_shape)) + 1
-        parsed['write_shift'] = tf.nn.softmax(tf.reshape(interface_vector[:, w_gamma_end:w_shift_end], w_shift_shape),dim=1)
+        parsed['write_shift'] = tf.nn.softmax(tf.reshape(interface_vector[:, w_gamma_end:w_shift_end], w_shift_shape),axis=1)
 
         parsed['erase_vector'] = tf.sigmoid(tf.reshape(interface_vector[:, w_shift_end:erase_end], erase_shape))
         parsed['write_vector'] = tf.reshape(interface_vector[:, erase_end:write_end], write_shape)
@@ -196,7 +196,7 @@ class BaseController:
         """
 
         flat_read_vectors = tf.reshape(last_read_vectors, (-1, self.word_size * self.read_heads))
-        complete_input = tf.concat(1, [X, flat_read_vectors])
+        complete_input = tf.concat([X, flat_read_vectors], 1)
         nn_output, nn_state = None, None
 
         if self.has_recurrent_nn:

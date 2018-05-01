@@ -7,7 +7,7 @@ class RecurrentController(BaseController):
         self.state = tf.Variable(tf.zeros([self.batch_size, 100]), trainable=False)
         self.output = tf.Variable(tf.zeros([self.batch_size, 100]), trainable=False)
 
-    def network_op(self, X, state):
+    def network_op(self, X, state=None):
         X = tf.convert_to_tensor(X)
         return self.lstm_cell(X, state)
 

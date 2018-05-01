@@ -66,6 +66,11 @@ if __name__ == '__main__':
 
     graph = tf.Graph()
 
+    tf.device('/cpu:0')
+    #config = tf.ConfigProto(device_count={'cpu':0})
+    #config.gpu_options.allow_growth = True
+    #config.gpu_options.per_process_gpu_memory_fraction = 0.7
+
     with graph.as_default():
         with tf.Session(graph=graph) as session:
 
@@ -118,7 +123,7 @@ if __name__ == '__main__':
 
             last_100_losses = []
 
-            for i in xrange(iterations + 1):
+            for i in range(iterations + 1):
                 llprint("\rIteration %d/%d" % (i, iterations))
 
                 random_length = np.random.randint(1, sequence_max_length + 1)
